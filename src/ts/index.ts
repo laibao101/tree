@@ -45,8 +45,8 @@ class Tree {
     /**
      * 刷新数据,重新生成一个树
      */
-    fresh(){
-
+    fresh(data:treeData[]){
+        this._data = data;
     }
 
     /**
