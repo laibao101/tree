@@ -24,5 +24,5 @@ gulp.task("default", ["webpack", "less"]);
 
 gulp.task("watch", () => {
     gulp.watch("less/**/*.less", ["less"]);
-    gulp.watch("js/**/*.ts", ["webpack"]);
+    gulp.watch("ts/**/*.ts", ["webpack"]);
 });
