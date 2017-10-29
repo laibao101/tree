@@ -114,7 +114,9 @@ var Tree = /** @class */function () {
     /**
      * 刷新数据,重新生成一个树
      */
-    Tree.prototype.fresh = function () {};
+    Tree.prototype.fresh = function (data) {
+        this._data = data;
+    };
     /**
      * 组件的html部分
      */
