@@ -99,11 +99,11 @@ var Tree = /** @class */function () {
      */
     Tree.prototype.create = function () {
         var _this = this;
-        var ul = this._html().ul;
+        var ul = this._curateUl();
         this._container = ul;
         ul.className = "tree-container";
         this._data.forEach(function (treeItem) {
-            var li = _this._html().li;
+            var li = _this._createLi();
             _this._container.appendChild(li);
             li.className = "tree-item";
             li.innerText = treeItem.element;
@@ -118,13 +118,16 @@ var Tree = /** @class */function () {
         this._data = data;
     };
     /**
-     * 组件的html部分
+     * 组件的ul部分
      */
-    Tree.prototype._html = function () {
-        return {
-            ul: document.createElement('ul'),
-            li: document.createElement('li')
-        };
+    Tree.prototype._curateUl = function () {
+        return document.createElement('ul');
+    };
+    /**
+     * 组件的li部分html
+     */
+    Tree.prototype._createLi = function () {
+        return document.createElement('li');
     };
     return Tree;
 }();

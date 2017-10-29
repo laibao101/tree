@@ -27,13 +27,13 @@ class Tree {
      * 创建一个树形组件
      */
     create(){
-        const {ul} = this._html();
+        const ul:HTMLElement = this._curateUl();
 
         this._container = ul;
         ul.className="tree-container";
 
         this._data.forEach((treeItem)=>{
-            const {li} = this._html();
+            const li:HTMLElement = this._createLi();
             this._container.appendChild(li);
             li.className="tree-item";
             li.innerText = treeItem.element;
@@ -50,15 +50,18 @@ class Tree {
     }
 
     /**
-     * 组件的html部分
+     * 组件的ul部分
      */
-    _html():treeHtml{
-        return {
-            ul:document.createElement('ul'),
-            li:document.createElement('li')
-        };
+    _curateUl():HTMLElement{
+           return document.createElement('ul');
     }
 
+    /**
+     * 组件的li部分html
+     */
+    _createLi():HTMLElement{
+        return document.createElement('li');
+    }
 }
 
 
