@@ -1,16 +1,20 @@
 interface treeHtml {
-    ul : HTMLElement;
-    li : HTMLElement;
+    ul: HTMLElement;
+    li: HTMLElement;
 }
 
 class Tree {
-    private _data : treeData[];
-    private _tree : HTMLElement = document.createElement("ul");
-    private _container : HTMLElement;
-    private _sortData : treeData[];
-    private root : treeData;
-    constructor(data : treeData[]) {
+    private _data: treeData[];
+    private tree: treeData[];
+    private _tree: HTMLElement = document.createElement("ul");
+    private _container: HTMLElement;
+    private initData: treeData[];
+    private root: treeData;
+    groups:any;
+    constructor(data: treeData[]) {
         this._data = data;
+        this.tree = this._data;
+        this.groups = {};
     }
 
     /**
@@ -28,15 +32,14 @@ class Tree {
      * 创建一个树形组件
      */
     create() {
-        const ul : HTMLElement = this._curateUl();
+        const ul: HTMLElement = this._curateUl();
 
         this._container = ul;
         ul.className = "tree-container";
 
-        const root = this._getRoot();
-
-        console.log(root);
         this._getTreeData();
+        this._group();
+        console.log(this.groups);
         // this
         //     ._data
         //     .forEach((treeItem) => {
@@ -55,66 +58,126 @@ class Tree {
     /**
      * 刷新数据,重新生成一个树
      */
-    fresh(data : treeData[]) {
+    fresh(data: treeData[]) {
         this._data = data;
     }
 
     /**
      * 组件的ul部分
      */
-    _curateUl() : HTMLElement {
+    _curateUl(): HTMLElement {
         return document.createElement('ul');
     }
 
     /**
      * 组件的li部分html
      */
-    _createLi() : HTMLElement {
+    _createLi(): HTMLElement {
         return document.createElement('li');
-    }
-    /**
-     * 获取root,pid最小的就是root
-     */
-    _getRoot() {
-        this._sortData = Array.from(this._data);
-        this
-            ._sortData
-            .sort((a, b) => a.pid - b.pid);
-        this.root = this._sortData[0];
-        this._sortData.splice(0,1);
-        return this.root;
     }
 
     /**
      * 获取treeData
      */
-    _getTreeData(){
-        console.log(this._getChild(this.root.pid));
+    _getTreeData() {
+        this.initData = Array.from(this._data);
+        this.initData.forEach((item) => {
+            item.key = item.id;
+            item.parentKey = item.pid;
+            item.text = item.element;
+        });
+
+        const tree = this._convertToTree(this.initData,this.initData[1]);
+        console.log(tree);
     }
 
     /**
      * 获取当前元素的子节点
      */
-    _getChild(pid:number){
-        let result:treeData[]=[];
-        this._sortData.forEach((item,index) => {
-            if(item.pid === pid){
-                result.push(item);
-                this._sortData.splice(index,1);
-            }
-        });
+    _hasParent(rows:any, row:any) {
+        let parentKey = row.parentKey;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].key === parentKey) return true;
+        }
+        return false;
+    }
 
-        return result;
+    _group(){
+        for(var i=0;i<this.tree.length;i++){
+            if(this.groups[this.tree[i].pid]){
+                this.groups[this.tree[i].pid].push(this.tree[i]);
+            }else{
+                this.groups[this.tree[i].pid]=[];
+                this.groups[this.tree[i].pid].push(this.tree[i]);
+            }
+        }
+    }
+
+    _convertToTree(rows:any, parentNode:any) {
+        // 这个函数会被多次调用，对rows做深拷贝，否则会产生副作用。
+        rows = rows.map((row:any) => {
+            return Object.assign({}, row);
+        });
+        parentNode = Object.assign({}, parentNode);
+        let nodes = [];
+        if (parentNode) {
+            nodes.push(parentNode);
+        } else {
+            // 获取所有的顶级节点
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i];
+                if (!this._hasParent(rows, row.parentKey)) {
+                    nodes.push(row);
+                }
+            }
+        }
+        // 存放要处理的节点
+        let toDo = nodes.map((v) => v);
+        while (toDo.length) {
+            // 处理一个，头部弹出一个。
+            let node = toDo.shift();
+            // 获取子节点。
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i];
+                if (row.parentKey === node.key) {
+                    let child = row;
+                    let parentKeys = [node.key];
+                    if (node.parentKeys) {
+                        parentKeys = node.parentKeys.concat(node.key);
+                    }
+                    child.parentKeys = parentKeys;
+                    let parentText = [node.text];
+                    if (node.parentText) {
+                        parentText = node.parentText.concat(node.text);
+                    }
+                    child.parentText = parentText;
+                    if (node.children) {
+                        node.children.push(child);
+                    } else {
+                        node.children = [child];
+                    }
+                    // child加入toDo，继续处理
+                    toDo.push(child);
+                }
+            }
+        }
+        if (parentNode) {
+            return nodes[0].children;
+        }
+        return nodes;
     }
 }
 
 interface treeData {
-    element : string;
-    id : number;
-    pid : number;
+    element: string;
+    id: number;
+    pid: number;
+    key?: number;
+    parentKey?: number;
+    text?:string;
 }
 
-const data : treeData[] = [
+const data: treeData[] = [
     {
         element: '轮播',
         id: 2,

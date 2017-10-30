@@ -83,6 +83,8 @@ var Tree = function () {
 
         this._tree = document.createElement("ul");
         this._data = data;
+        this.tree = this._data;
+        this.groups = {};
     }
     /**
      * 返回data
@@ -99,9 +101,9 @@ var Tree = function () {
             var ul = this._curateUl();
             this._container = ul;
             ul.className = "tree-container";
-            var root = this._getRoot();
-            console.log(root);
             this._getTreeData();
+            this._group();
+            console.log(this.groups);
             // this
             //     ._data
             //     .forEach((treeItem) => {
@@ -144,46 +146,102 @@ var Tree = function () {
             return document.createElement('li');
         }
         /**
-         * 获取root,pid最小的就是root
-         */
-
-    }, {
-        key: "_getRoot",
-        value: function _getRoot() {
-            this._sortData = Array.from(this._data);
-            this._sortData.sort(function (a, b) {
-                return a.pid - b.pid;
-            });
-            this.root = this._sortData[0];
-            this._sortData.splice(0, 1);
-            return this.root;
-        }
-        /**
          * 获取treeData
          */
 
     }, {
         key: "_getTreeData",
         value: function _getTreeData() {
-            console.log(this._getChild(this.root.pid));
+            this.initData = Array.from(this._data);
+            this.initData.forEach(function (item) {
+                item.key = item.id;
+                item.parentKey = item.pid;
+                item.text = item.element;
+            });
+            var tree = this._convertToTree(this.initData, this.initData[1]);
+            console.log(tree);
         }
         /**
          * 获取当前元素的子节点
          */
 
     }, {
-        key: "_getChild",
-        value: function _getChild(pid) {
-            var _this = this;
-
-            var result = [];
-            this._sortData.forEach(function (item, index) {
-                if (item.pid === pid) {
-                    result.push(item);
-                    _this._sortData.splice(index, 1);
+        key: "_hasParent",
+        value: function _hasParent(rows, row) {
+            var parentKey = row.parentKey;
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].key === parentKey) return true;
+            }
+            return false;
+        }
+    }, {
+        key: "_group",
+        value: function _group() {
+            for (var i = 0; i < this.tree.length; i++) {
+                if (this.groups[this.tree[i].pid]) {
+                    this.groups[this.tree[i].pid].push(this.tree[i]);
+                } else {
+                    this.groups[this.tree[i].pid] = [];
+                    this.groups[this.tree[i].pid].push(this.tree[i]);
                 }
+            }
+        }
+    }, {
+        key: "_convertToTree",
+        value: function _convertToTree(rows, parentNode) {
+            // 这个函数会被多次调用，对rows做深拷贝，否则会产生副作用。
+            rows = rows.map(function (row) {
+                return Object.assign({}, row);
             });
-            return result;
+            parentNode = Object.assign({}, parentNode);
+            var nodes = [];
+            if (parentNode) {
+                nodes.push(parentNode);
+            } else {
+                // 获取所有的顶级节点
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    if (!this._hasParent(rows, row.parentKey)) {
+                        nodes.push(row);
+                    }
+                }
+            }
+            // 存放要处理的节点
+            var toDo = nodes.map(function (v) {
+                return v;
+            });
+            while (toDo.length) {
+                // 处理一个，头部弹出一个。
+                var node = toDo.shift();
+                // 获取子节点。
+                for (var _i = 0; _i < rows.length; _i++) {
+                    var _row = rows[_i];
+                    if (_row.parentKey === node.key) {
+                        var child = _row;
+                        var parentKeys = [node.key];
+                        if (node.parentKeys) {
+                            parentKeys = node.parentKeys.concat(node.key);
+                        }
+                        child.parentKeys = parentKeys;
+                        var parentText = [node.text];
+                        if (node.parentText) {
+                            parentText = node.parentText.concat(node.text);
+                        }
+                        child.parentText = parentText;
+                        if (node.children) {
+                            node.children.push(child);
+                        } else {
+                            node.children = [child];
+                        }
+                        // child加入toDo，继续处理
+                        toDo.push(child);
+                    }
+                }
+            }
+            if (parentNode) {
+                return nodes[0].children;
+            }
+            return nodes;
         }
     }, {
         key: "data",

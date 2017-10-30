@@ -1,12 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <script src="js/index.js"></script>
+    <script>
+        /// 部门信息
+        var departRows = [{
+            parentDepartId: 'root',
+            departId: 'DC',
+            departName: '集团'
+        }, {
+            parentDepartId: 'DC',
+            departId: '01',
+            departName: '上海本部'
+        }, {
+            parentDepartId: 'DC',
+            departId: '02',
+            departName: '中华企业'
+        }, {
+            parentDepartId: '02',
+            departId: '0200',
+            departName: '中华企业股份有限公司本部'
+        }, {
+            parentDepartId: '02',
+            departId: '0201',
+            departName: '上海古北（集团）有限公司'
+        }, {
+            parentDepartId: '0201',
+            departId: '020100',
+            departName: '上海古北（集团）有限公司本部'
+        }, {
+            parentDepartId: '0201',
+            departId: '020101',
+            departName: '上海古北顾村置业有限公司'
+        }, {
+            parentDepartId: '0201',
+            departId: '020102',
+            departName: '上海古北京宸置业发展有限公司'
+        }, {
+            parentDepartId: '0201',
+            departId: '020103',
+            departName: '苏州洞庭房地产发展有限公司'
+        }];
+
+        /// <summary>
+        /// 行结构数据转化为树形结构数据
+        /// </summary>
+        /// <param name="rows">行结构数据</param> 
+        /// <param name="attributes">属性信息</param> 
+        function convertTreeData(rows, attributes) {
+            var keyNodes = {},
+                parentKeyNodes = {};
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                row.id = row[attributes.keyField];
+                row.parentId = row[attributes.parentKeyField];
+                row.text = row[attributes.textField];
+                row.children = [];
+
+                keyNodes[row.id] = row;
+
+                if (parentKeyNodes[row.parentId]) {
+                    parentKeyNodes[row.parentId].push(row);
+                } else {
+                    parentKeyNodes[row.parentId] = [row];
+                }
+
+                var children = parentKeyNodes[row.id];
+                if (children) {
+                    row.children = children;
+                }
+
+                var pNode = keyNodes[row.parentId];
+                if (pNode) {
+                    pNode.children.push(row);
+                }
+            }
+            console.log(parentKeyNodes.root);
+            return parentKeyNodes[attributes.rootParentId];
+        }
+
+        // 属性配置信息
+        var attributes = {
+            // key对应字段
+            keyField: 'departId',
+            // 上级key对应字段
+            parentKeyField: 'parentDepartId',
+            // 文本对应字段
+            textField: 'departName',
+            // 根节点上级key对应的值
+            rootKey: 'root'
+        }
+
+        var data1 = convertTreeData(departRows, attributes);
+        console.log(data1);
+    </script>
 </body>
+
 </html>
