@@ -77,181 +77,38 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var TreeNode = function TreeNode(node) {
+    _classCallCheck(this, TreeNode);
+
+    this.key = node.id;
+    this.parent = node.pid;
+    this.element = node.element;
+    this.children = [];
+};
+
 var Tree = function () {
     function Tree(data) {
         _classCallCheck(this, Tree);
 
-        this._tree = document.createElement("ul");
         this._data = data;
-        this.tree = this._data;
-        this.groups = {};
+        this._initTree();
     }
-    /**
-     * 返回data
-     */
-
 
     _createClass(Tree, [{
-        key: "create",
-
-        /**
-         * 创建一个树形组件
-         */
-        value: function create() {
-            var ul = this._curateUl();
-            this._container = ul;
-            ul.className = "tree-container";
-            this._getTreeData();
-            this._group();
-            console.log(this.groups);
-            // this
-            //     ._data
-            //     .forEach((treeItem) => {
-            //         const li : HTMLElement = this._createLi();
-            //         this
-            //             ._container
-            //             .appendChild(li);
-            //         li.className = "tree-item";
-            //         li.innerText = treeItem.element;
-            //         li.id = `tree-item-${treeItem.id}`;
-            //         li.setAttribute("data-pid", `${treeItem.pid}`);
-            //     }, this);
-            // this._tree = this._container;
-        }
-        /**
-         * 刷新数据,重新生成一个树
-         */
-
-    }, {
-        key: "fresh",
-        value: function fresh(data) {
-            this._data = data;
-        }
-        /**
-         * 组件的ul部分
-         */
-
-    }, {
-        key: "_curateUl",
-        value: function _curateUl() {
-            return document.createElement('ul');
-        }
-        /**
-         * 组件的li部分html
-         */
-
-    }, {
-        key: "_createLi",
-        value: function _createLi() {
-            return document.createElement('li');
-        }
-        /**
-         * 获取treeData
-         */
-
-    }, {
-        key: "_getTreeData",
-        value: function _getTreeData() {
-            this.initData = Array.from(this._data);
-            this.initData.forEach(function (item) {
-                item.key = item.id;
-                item.parentKey = item.pid;
-                item.text = item.element;
-            });
-            var tree = this._convertToTree(this.initData, this.initData[1]);
-            console.log(tree);
-        }
-        /**
-         * 获取当前元素的子节点
-         */
-
-    }, {
-        key: "_hasParent",
-        value: function _hasParent(rows, row) {
-            var parentKey = row.parentKey;
-            for (var i = 0; i < rows.length; i++) {
-                if (rows[i].key === parentKey) return true;
-            }
-            return false;
-        }
-    }, {
-        key: "_group",
-        value: function _group() {
-            for (var i = 0; i < this.tree.length; i++) {
-                if (this.groups[this.tree[i].pid]) {
-                    this.groups[this.tree[i].pid].push(this.tree[i]);
+        key: '_initTree',
+        value: function _initTree() {
+            var initData = Array.from(this._data);
+            var count = 0;
+            while (initData.length && count < initData.length) {
+                if (this.root) {
+                    if (initData[count].pid === this.root.key) {
+                        this.root.children.push(new TreeNode(initData[count]));
+                    }
+                    count++;
                 } else {
-                    this.groups[this.tree[i].pid] = [];
-                    this.groups[this.tree[i].pid].push(this.tree[i]);
+                    this.root = new TreeNode({ id: 0, pid: -1, element: 'root' });
                 }
             }
-        }
-    }, {
-        key: "_convertToTree",
-        value: function _convertToTree(rows, parentNode) {
-            // 这个函数会被多次调用，对rows做深拷贝，否则会产生副作用。
-            rows = rows.map(function (row) {
-                return Object.assign({}, row);
-            });
-            parentNode = Object.assign({}, parentNode);
-            var nodes = [];
-            if (parentNode) {
-                nodes.push(parentNode);
-            } else {
-                // 获取所有的顶级节点
-                for (var i = 0; i < rows.length; i++) {
-                    var row = rows[i];
-                    if (!this._hasParent(rows, row.parentKey)) {
-                        nodes.push(row);
-                    }
-                }
-            }
-            // 存放要处理的节点
-            var toDo = nodes.map(function (v) {
-                return v;
-            });
-            while (toDo.length) {
-                // 处理一个，头部弹出一个。
-                var node = toDo.shift();
-                // 获取子节点。
-                for (var _i = 0; _i < rows.length; _i++) {
-                    var _row = rows[_i];
-                    if (_row.parentKey === node.key) {
-                        var child = _row;
-                        var parentKeys = [node.key];
-                        if (node.parentKeys) {
-                            parentKeys = node.parentKeys.concat(node.key);
-                        }
-                        child.parentKeys = parentKeys;
-                        var parentText = [node.text];
-                        if (node.parentText) {
-                            parentText = node.parentText.concat(node.text);
-                        }
-                        child.parentText = parentText;
-                        if (node.children) {
-                            node.children.push(child);
-                        } else {
-                            node.children = [child];
-                        }
-                        // child加入toDo，继续处理
-                        toDo.push(child);
-                    }
-                }
-            }
-            if (parentNode) {
-                return nodes[0].children;
-            }
-            return nodes;
-        }
-    }, {
-        key: "data",
-        get: function get() {
-            return this._data;
-        }
-    }, {
-        key: "html",
-        get: function get() {
-            return this._tree;
         }
     }]);
 
@@ -311,10 +168,9 @@ var data = [{
     id: 13,
     pid: 9
 }];
-// 单元测试
+// 单元测试 
 var tree = new Tree(data);
-tree.create();
-console.log(tree.html);
+console.log(tree);
 
 /***/ })
 /******/ ]);

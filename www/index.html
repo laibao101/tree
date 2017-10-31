@@ -13,41 +13,41 @@
     <script>
         /// 部门信息
         var departRows = [{
-            parentDepartId: 'root',
-            departId: 'DC',
-            departName: '集团'
+            pId: 'root',
+            id: 'DC',
+            name: '集团'
         }, {
-            parentDepartId: 'DC',
-            departId: '01',
-            departName: '上海本部'
+            pId: 'DC',
+            id: '01',
+            name: '上海本部'
         }, {
-            parentDepartId: 'DC',
-            departId: '02',
-            departName: '中华企业'
+            pId: 'DC',
+            id: '02',
+            name: '中华企业'
         }, {
-            parentDepartId: '02',
-            departId: '0200',
-            departName: '中华企业股份有限公司本部'
+            pId: '02',
+            id: '0200',
+            name: '中华企业股份有限公司本部'
         }, {
-            parentDepartId: '02',
-            departId: '0201',
-            departName: '上海古北（集团）有限公司'
+            pId: '02',
+            id: '0201',
+            name: '上海古北（集团）有限公司'
         }, {
-            parentDepartId: '0201',
-            departId: '020100',
-            departName: '上海古北（集团）有限公司本部'
+            pId: '0201',
+            id: '020100',
+            name: '上海古北（集团）有限公司本部'
         }, {
-            parentDepartId: '0201',
-            departId: '020101',
-            departName: '上海古北顾村置业有限公司'
+            pId: '0201',
+            id: '020101',
+            name: '上海古北顾村置业有限公司'
         }, {
-            parentDepartId: '0201',
-            departId: '020102',
-            departName: '上海古北京宸置业发展有限公司'
+            pId: '0201',
+            id: '020102',
+            name: '上海古北京宸置业发展有限公司'
         }, {
-            parentDepartId: '0201',
-            departId: '020103',
-            departName: '苏州洞庭房地产发展有限公司'
+            pId: '0201',
+            id: '020103',
+            name: '苏州洞庭房地产发展有限公司'
         }];
 
         /// <summary>
@@ -89,17 +89,78 @@
         // 属性配置信息
         var attributes = {
             // key对应字段
-            keyField: 'departId',
+            keyField: 'id',
             // 上级key对应字段
-            parentKeyField: 'parentDepartId',
+            parentKeyField: 'pId',
             // 文本对应字段
-            textField: 'departName',
+            textField: 'name',
             // 根节点上级key对应的值
             rootKey: 'root'
         }
 
         var data1 = convertTreeData(departRows, attributes);
         console.log(data1);
+
+
+        var zNodes = [
+            { id: 0, pId: -1, name: "Aaaa" },
+            { id: 1, pId: 0, name: "A" },
+            { id: 11, pId: 1, name: "A1" },
+            { id: 12, pId: 1, name: "A2" },
+            { id: 13, pId: 1, name: "A3" },
+            { id: 2, pId: 0, name: "B" },
+            { id: 21, pId: 2, name: "B1" },
+            { id: 22, pId: 2, name: "B2" },
+            { id: 23, pId: 2, name: "B3" },
+            { id: 3, pId: 0, name: "C" },
+            { id: 31, pId: 3, name: "C1" },
+            { id: 32, pId: 3, name: "C2" },
+            { id: 33, pId: 3, name: "C3" },
+            { id: 34, pId: 31, name: "x" },
+            { id: 35, pId: 31, name: "y" },
+            { id: 36, pId: 31, name: "z" },
+            { id: 37, pId: 36, name: "z1123" },
+            { id: 38, pId: 37, name: "z123123123" },
+            { id: 39, pId: 38, name: "z123123123" },
+            { id: 340, pId: 39, name: "z123123123" }
+        ];
+        function treeMenu(a) {
+            this.tree = a || [];
+            this.groups = {};
+        };
+        treeMenu.prototype = {
+            init: function (pid) {
+                this.group();
+                return this.getDom(this.groups[pid]);
+            },
+            group: function () {
+                for (var i = 0; i < this.tree.length; i++) {
+                    if (this.groups[this.tree[i].pId]) {
+                        this.groups[this.tree[i].pId].push(this.tree[i]);
+                    } else {
+                        this.groups[this.tree[i].pId] = [];
+                        this.groups[this.tree[i].pId].push(this.tree[i]);
+                    }
+                }
+            },
+            getDom: function (a) {
+                if (!a) { return '' }
+                var html = '\n<ul >\n';
+                for (var i = 0; i < a.length; i++) {
+                    html += '<li><a href="#">' + a[i].name + '</a>';
+                    html += this.getDom(this.groups[a[i].id]);
+                    html += '</li>\n';
+                };
+                html += '</ul>\n';
+                return html;
+            }
+        };
+        var html = new treeMenu(zNodes).init(-1);
+
+        var html2 = new treeMenu(departRows).init('root');
+       document.body.innerHTML=html+html2;
+
+
     </script>
 </body>
 
