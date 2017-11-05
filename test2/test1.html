@@ -85,9 +85,9 @@
 
         function MultipleTree(config) {
             var conf = config;
-            this.data = conf.data;
+            this.originData = conf.data.slice(0);
             this.nodeList = [];
-            this.rootList = this.init(this.data);
+            this.rootList = this.init(config.data);
             this.root = this.rootList.filter(function(item) {
                 return item.id === conf.rootId;
             })[0];
@@ -218,8 +218,8 @@
                 }
 
                 Array.isArray(data) ? data.forEach(function(rootItem) {
-                    container.appendChild(create(rootItem, document.createElement("div")));
-                }, this) : container.appendChild(create(data, document.createElement("div")));
+                    container.appendChild(create(rootItem, createUl()));
+                }, this) : container.appendChild(create(data, createUl()));
 
                 return container;
             }
