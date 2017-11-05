@@ -2,7 +2,7 @@
  * Created by zouzehua on 2016-8-22.
  */
 class MultipleTree {
-    static  run() {
+    static run() {
         //读取层次数据结果集列表
         let dataList = VirtualDataGenerator.getVirtualResult();
         // 构造加权多叉树
@@ -86,7 +86,7 @@ class MultipleTree {
      * @param root
      * @return
      */
-    static  buildFunctionLeafList(root) {
+    static buildFunctionLeafList(root) {
         let functionLeafList = [];
         root.initializeLeafList(functionLeafList);
 
@@ -98,7 +98,7 @@ class MultipleTree {
      * @param root
      * @param keyWord
      */
-    static  searchTreeNode(root, keyWord) {
+    static searchTreeNode(root, keyWord) {
         // 首先设置整棵树的功能路径为不可见
         root.setTreeNotVisible();
         // 在整棵功能树中搜索包含关键字的节点，并进行路径筛选
@@ -109,7 +109,7 @@ class MultipleTree {
      * 增加功能路径权值
      * @param root
      */
-    static   increaseRouteWeight(root, functionLeafList, nodeId) {
+    static increaseRouteWeight(root, functionLeafList, nodeId) {
         // 首先设置整棵树的功能路径为可见
         root.setTreeVisible();
         // 对包含功能叶子节点的路径权值加1
@@ -126,8 +126,9 @@ class MultipleTree {
      * @param functionLeafList
      * @return
      */
-    static  getHotFunctionLeaf(functionLeafList) {
-        let count = 0, totalWeight = 0;
+    static getHotFunctionLeaf(functionLeafList) {
+        let count = 0,
+            totalWeight = 0;
         for (let i in functionLeafList) {
             let node = functionLeafList[i];
             totalWeight += node.weight;
@@ -149,7 +150,7 @@ class MultipleTree {
         return retList;
     }
 
-    static  getRound(num, len) {
+    static getRound(num, len) {
         return Math.round(num * Math.pow(10, len)) / Math.pow(10, len);
     }
 
@@ -157,7 +158,7 @@ class MultipleTree {
      * 输出热点功能叶子
      * @param hotFunctionLeaf
      */
-    static  printHotFunctionLeaf(hotFunctionLeaf) {
+    static printHotFunctionLeaf(hotFunctionLeaf) {
         let result = '[';
         if (hotFunctionLeaf) {
             for (let i in hotFunctionLeaf) {
