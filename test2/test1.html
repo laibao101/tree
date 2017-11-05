@@ -90,7 +90,7 @@
             this.rootList = this.init(this.data);
             this.root = this.rootList.filter(function(item) {
                 return item.id === conf.rootId;
-            });
+            })[0];
         }
 
         MultipleTree.prototype.init = function(dataList) {
@@ -139,37 +139,41 @@
         var mock2 = [{
             id: 1,
             pid: 0,
-            name: 1
+            name: 1,
+            visible: false
         }, {
             id: 2,
             pid: 1,
-            name: 2
+            name: 2,
+            visible: false
         }, {
             id: 3,
             pid: 1,
-            name: 3
+            name: 3,
+            visible: true
         }, {
             id: 4,
             pid: 1,
-            name: 4
+            name: 4,
+            visible: false
         }, {
             id: 5,
             pid: 1,
-            name: 5
+            name: 5,
+            visible: false
         }, {
             id: 6,
             pid: 1,
-            name: 6
+            name: 6,
+            visible: false
         }, {
             id: 7,
             pid: -1,
-            name: 7
+            name: 7,
+            visible: true
         }];
 
-        var config2 = {
-            data: mock2,
-            rootId: 1
-        };
+
 
         // var mul2 = new MultipleTree(config2);
 
@@ -191,9 +195,9 @@
                 return document.createElement("span");
             }
 
-            var createTreeDom = function() {
+            var createTreeDom = function(renderData) {
                 var container = document.createElement("div");
-                var data = this.getTree();
+                var data = renderData || this.getTree();
 
                 function create(data, container) {
                     var ul = createUl();
@@ -213,9 +217,9 @@
                     return container;
                 }
 
-                data.forEach(function(rootItem) {
+                Array.isArray(data) ? data.forEach(function(rootItem) {
                     container.appendChild(create(rootItem, document.createElement("div")));
-                }, this);
+                }, this) : container.appendChild(create(data, document.createElement("div")));
 
                 return container;
             }
@@ -225,9 +229,50 @@
 
         TreeDom.prototype = MultipleTree.prototype;
 
+        TreeDom.prototype.searchNode = function(name) {
+            var findNode = this.nodeList;
+            this.nodeList.forEach(function(node) {
+                if (node.values.name == name) {
+                    findNode = node;
+                }
+            });
+
+            return findNode;
+        }
+
+        TreeDom.prototype.filterTree = function(callback) {
+            if (callback) {
+                return callback();
+            }
+            return true;
+        }
+
+        var config2 = {
+            data: mock2,
+            rootId: 1
+        };
         var tree = new TreeDom(config2);
         var treeDom = tree.getTreeDom();
+        var data = tree.searchNode(7);
+
+
         document.getElementById("container").appendChild(treeDom);
+
+        setTimeout(function() {
+            var treeDom = tree.getTreeDom(data);
+            document.getElementById("container").appendChild(treeDom);
+        }, 5000);
+
+        setTimeout(function() {
+            var treeDom = tree.getTreeDom();
+            document.getElementById("container").appendChild(treeDom);
+        }, 7000);
+
+        setTimeout(function() {
+            var data3 = tree.searchNode();
+            var treeDom3 = tree.getTreeDom(data3);
+            document.getElementById("container").appendChild(treeDom3);
+        }, 9000);
     </script>
 </body>
 
