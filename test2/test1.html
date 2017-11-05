@@ -128,6 +128,16 @@
         MultipleTree.prototype.getRoot = function(conf) {
             return this.root;
         }
+
+        MultipleTree.prototype.search = function(name) {
+            var result = this.originData.slice(0);
+            var a = result.filter(function(item) {
+                item.name == name;
+            });
+            console.log(a);
+            return a;
+        }
+
         var config = {
             data: mock,
             rootId: 1
@@ -171,7 +181,17 @@
             pid: -1,
             name: 7,
             visible: true
-        }];
+        }, {
+            id: 8,
+            pid: 6,
+            name: "baidu",
+            visible: false
+        }, {
+            id: 9,
+            pid: 6,
+            name: "baidu",
+            visible: false
+        }, ];
 
 
 
@@ -258,21 +278,26 @@
 
         document.getElementById("container").appendChild(treeDom);
 
-        setTimeout(function() {
-            var treeDom = tree.getTreeDom(data);
-            document.getElementById("container").appendChild(treeDom);
-        }, 5000);
+        // setTimeout(function() {
+        //     var treeDom = tree.getTreeDom(data);
+        //     document.getElementById("container").appendChild(treeDom);
+        // }, 5000);
 
-        setTimeout(function() {
-            var treeDom = tree.getTreeDom();
-            document.getElementById("container").appendChild(treeDom);
-        }, 7000);
+        // setTimeout(function() {
+        //     var treeDom = tree.getTreeDom();
+        //     document.getElementById("container").appendChild(treeDom);
+        // }, 7000);
 
-        setTimeout(function() {
-            var data3 = tree.searchNode();
-            var treeDom3 = tree.getTreeDom(data3);
-            document.getElementById("container").appendChild(treeDom3);
-        }, 9000);
+        // setTimeout(function() {
+        //     var data3 = tree.searchNode();
+        //     var treeDom3 = tree.getTreeDom(data3);
+        //     document.getElementById("container").appendChild(treeDom3);
+        // }, 9000);
+
+
+        var searchData = tree.search("baidu");
+
+        console.log(searchData);
     </script>
 </body>
 
